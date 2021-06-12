@@ -18,15 +18,42 @@ bot.remove_command('help')
 ########
 #change weekly lb on monday 00:00 and print
 
-@bot.event()
+@bot.event
 async def on_time():
     my_date = datetime.utcnow()
     day = calendar.day_name[my_date.weekday()]
     if "00:00:00" in my_date and day=="Monday":
         ch = bot.get_channel(lb_id)
-        emb1 = discord.Embed(title = "Weekly Leaderboard", color = 0xFFD700)
+        wkly = {}
+        with open("assets/weekly_leaderboard.json", "r") as f:
+            wkly = json.load(f)
+        f.close()
+        users = list(wkly.keys())
+        crypt, code = [], []
+        for usr in wkly:
+            crypt.append(wkly[usr]["crypt"])
+            code.append(wkly[usr]["code"])
+        total = len(wkly)
+        pages = total//5 + 1
+        if total%5==0:
+            pages-=1
 
-
+        embs = []
+        e1 = discord.Embed(title="Weekly Leaderboard", color = 0xFFD700)
+        if len(users)<=5:
+            e1.add_field(name = "Username", value="\n".join(users), inline = True)
+            e1.add_field(name = "Cryptic Score", value = "\n".join(crypt), inline = True)
+            e1.add_field(name = "Comdimg Score", value = "\n".join(code), inline = True)
+        else:
+            e1.add_field(name = "Username", value="\n".join(users[:5]), inline = True)
+            e1.add_field(name = "Cryptic Score", value = "\n".join(crypt[:5]), inline = True)
+            e1.add_field(name = "Comdimg Score", value = "\n".join(code[:5]), inline = True)
+        e1.set_footer(text = "Page 1", icon_url="https://cdn.discordapp.com/emojis/852073834337140756.png?v=1")
+        embs.append(e1)
+        i = 5
+        for pg in range(2, pages+1):
+            e = discord.Embed(title = "")
+            e.set_footer(text = f"Page {pg}", icon_url="https://cdn.discordapp.com/emojis/852073834337140756.png?v=1")
 ########
 
 @bot.command()
