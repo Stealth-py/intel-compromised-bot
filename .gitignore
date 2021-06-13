@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 assets/complete_leaderboard.json
 assets/weekly_leaderboard.json
+test.py
