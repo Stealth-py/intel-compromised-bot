@@ -1,5 +1,7 @@
 import discord, os
 from discord import client
+from discord import activity
+from discord.channel import DMChannel
 from discord.ext import commands, tasks
 from discord.ext.commands import context
 from dotenv import load_dotenv
@@ -14,19 +16,21 @@ cryptic_id = int(os.environ.get("CRYPTIC"))
 coding_id = int(os.environ.get("CODING"))
 lb_id = int(os.environ.get("LEADERBOARD_CHANNEL"))
 
-bot = commands.Bot(command_prefix=".", case_insensitive = True)
-bot.remove_command('help')
+act = discord.Game(name = "hmm")
 
+bot = commands.Bot(command_prefix=".", case_insensitive = True, activity = act)
+bot.remove_command('help')
 
 @bot.command()
 async def help(ctx):
     e1 = discord.Embed(title = "Help", color = 0xFFFFFF)
     try:
         if str(ctx.message.channel.category) == "Admin":
-            e1.add_field(name = "answer", value = "Use this format to store the answer to the current cryptic hunt question.\n`.answer {put-your-answer-here}`\nFor example: `.answer seks` will put in the answer to the current question as `seks`.", inline = False)
+            e1.add_field(name = "`answer`", value = "Use this format to store the answer to the current cryptic hunt question.\nFormat: `.answer {put-your-answer-here}`\nFor example: `.answer seks` will put in the answer to the current question as `seks`.", inline = False)
         else:
-            e1.add_field(name = "answer", value = "Format: `.answer {your-answer-to-the-question}`.\nUse this command to dm the bot with your answer to the current cryptic question. If the answer is correct, the points will be added.\nRemember, 10 points as each day passes, till the current level is open. So.. you know what to do don't you :).\nP.S.: PLEASE JUST DM THE BOT WITH THE ANSWER AND NOT USE THIS COMMAND ANYWHERE ELSE!", inline = False)
-            e1.set_footer(text = "hmmm.", icon_url="https://cdn.discordapp.com/emojis/815651236162306078.png?v=1")
+            e1.add_field(name = "`answer`", value = "Format: `.answer {your-answer-to-the-question}`.\nUse this command to dm the bot with your answer to the current cryptic question. If the answer is correct, the points will be added.\nRemember, 10 points will be deducted as each day passes, till the current level is open. So.. you know what to do don't you :).\nP.S.: PLEASE JUST DM THE BOT WITH THE ANSWER AND NOT USE THIS COMMAND ANYWHERE ELSE!", inline = False)
+        e1.add_field(name = "`showlb`", value = "Use this command to print out the current weekly leaderboard.", inline = False)
+        e1.set_footer(text = "hmmm.", icon_url="https://cdn.discordapp.com/emojis/815651236162306078.png?v=1")
     except:
         e1.add_field(name = "hmm", value = "ok just use this command in the server you dumbo ._. fkn dumbass.. meh.")
         e1.set_thumbnail(url="https://media1.tenor.com/images/dd0935f96369c070cfba271ef0fce74a/tenor.gif?itemid=12516944")
@@ -36,15 +40,8 @@ async def help(ctx):
 
 @bot.command()
 async def answer(ctx):
-    if ctx.channel == bot.get_channel(770964768642433045):
-        ans, pts = ctx.message.content.strip(".answer ")
-        pts = int(pts)
-        to_ans = {"answer": ans, "points": pts}
-        with open("assets/answer.json", "r") as f:
-            f.write(json.dumps(to_ans, indent=4))
-        f.close()
-    elif isinstance(ctx.channel, discord.channel.DMChannel):
-        ans = ctx.message.content.strip(".answer ")
+    if isinstance(ctx.channel, discord.channel.DMChannel):
+        ans = ctx.message.content.strip(".answer")
         ans = ''.join(ans.split()).lower()
         usr = ctx.message.author.name.lower()
         print(ans, type(usr))
@@ -89,6 +86,21 @@ async def answer(ctx):
             with open("assets/weekly_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
+    elif str(ctx.message.channel.category) == "Admin":
+        ans = ctx.message.content.strip(".answer")
+        ans = ''.join(ans.split()).lower()
+        to_ans = {"answer": ans, "points": 100}
+        obj = json.dumps(to_ans, indent=4)
+        with open("assets/answer.json", "w") as f:
+            f.write(obj)
+        f.close()
+        print(to_ans)
+    else:
+        emb = discord.Embed(title="OMFG", color=0xff0000)
+        emb.set_thumbnail(url = "https://cdn.discordapp.com/emojis/690588303384248370.png?v=1")
+        emb.add_field(name="BRO!", value="I TOLD YOU TO NOT USE THIS COMMAND ANYWHERE ELSE DIDNT I? YOU FKN DUMBASS...")
+        emb.set_footer(text="hmmm. no. 😡", icon_url="https://cdn.discordapp.com/emojis/802002531487973396.gif?v=1")
+        await ctx.message.author.send(embed=emb)
 
 ##update cryptic scores each day
 @tasks.loop(seconds = 1.0)
@@ -232,7 +244,7 @@ on_time.start()
 async def cryptic(ctx):
     emb = discord.Embed(title = "Cryptic Challenge", color = 0x800080)
     ch = bot.get_channel(cryptic_id)
-    msg_content = ctx.message.content.strip(".cryptic ")
+    msg_content = ctx.message.content.strip(".cryptic")
     emb.add_field(name = "Challenge", value = msg_content, inline = False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
@@ -242,7 +254,7 @@ async def cryptic(ctx):
 async def coding(ctx):
     emb = discord.Embed(title = "Coding Challenges", color = 0x800080)
     ch = bot.get_channel(coding_id)
-    msg_content = ctx.message.content.strip(".coding ")
+    msg_content = ctx.message.content.strip(".coding")
     emb.add_field(name = "Challenge", value = msg_content, inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
@@ -250,7 +262,7 @@ async def coding(ctx):
 
 @bot.command()
 async def updatelb(ctx):
-    msg = ctx.message.content.strip(".updatelb ")
+    msg = ctx.message.content.strip(".updatelb")
     usr, code = msg.split()
     code = int(code)
 
