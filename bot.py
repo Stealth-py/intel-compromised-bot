@@ -27,6 +27,9 @@ async def help(ctx):
     try:
         if str(ctx.message.channel.category) == "Admin":
             e1.add_field(name = "`answer`", value = "Use this format to store the answer to the current cryptic hunt question.\nFormat: `.answer {put-your-answer-here}`\nFor example: `.answer seks` will put in the answer to the current question as `seks`.", inline = False)
+            e1.add_field(name = "`updatelb`", value = "Format: `.updatelb {username-in-the-server} {coding-score} {design-score} {gaming-score}`.\nIf only one type of score is to be updated please use the others score(s) as 0. For example: If I need to update coding score for stealth.py by 100, type `.updatelb stealth.py 100 0 0`.", inline = False)
+            e1.add_field(name = "`cryptic`", value = "Format: `.cryptic {the full challenge message}`.\nFor example: If the challenge message is, let's say, `decode frxf using ROT13`, then you need to type in the command `.cryptic decode frxf using ROT13`.", inline = False)
+            e1.add_field(name = "`coding`", value = "Format: `.coding {the full challenge message}`.\nFor example: If the challenge message is, let's say, `make a discord bot which responds whenever a user writes seks in the chat`, then you need to type in the command `.coding make a discord bot which responds whenever a user writes seks in the chat`", inline = False)
         else:
             e1.add_field(name = "`answer`", value = "Format: `.answer {your-answer-to-the-question}`.\nUse this command to dm the bot with your answer to the current cryptic question. If the answer is correct, the points will be added.\nRemember, 10 points will be deducted as each day passes, till the current level is open. So.. you know what to do don't you :).\nP.S.: PLEASE JUST DM THE BOT WITH THE ANSWER AND NOT USE THIS COMMAND ANYWHERE ELSE!", inline = False)
         e1.add_field(name = "`showlb`", value = "Use this command to print out the current weekly leaderboard.", inline = False)
@@ -63,7 +66,7 @@ async def answer(ctx):
                     compltlb[usr]["crypt"]+=crypt
                 else:
                     compltlb[usr] = {"code": 0, "crypt": crypt}
-            
+
             obj = json.dumps(compltlb, indent = 4)
             print(obj)
             with open("assets/complete_leaderboard.json", "w") as f:
@@ -101,6 +104,7 @@ async def answer(ctx):
         emb.add_field(name="BRO!", value="I TOLD YOU TO NOT USE THIS COMMAND ANYWHERE ELSE DIDNT I? YOU FKN DUMBASS...")
         emb.set_footer(text="hmmm. no. 😡", icon_url="https://cdn.discordapp.com/emojis/802002531487973396.gif?v=1")
         await ctx.message.author.send(embed=emb)
+        await ctx.message.delete()
 
 ##update cryptic scores each day
 @tasks.loop(seconds = 1.0)
@@ -263,8 +267,10 @@ async def coding(ctx):
 @bot.command()
 async def updatelb(ctx):
     msg = ctx.message.content.strip(".updatelb")
-    usr, code = msg.split()
+    usr, code, des, gam = msg.split()
     code = int(code)
+    des = int(des)
+    gam = int(gam)
 
     usr = usr.lower()
 
@@ -274,12 +280,14 @@ async def updatelb(ctx):
     f.close()
 
     if not compltlb:
-        compltlb = {usr: {"code": code, "crypt": 0}}
+        compltlb = {usr: {"code": code, "crypt": 0, "design": des, "gaming": gam}}
     else:
         if usr in compltlb:
             compltlb[usr]["code"]+=code
+            compltlb[usr]["design"]+=des
+            compltlb[usr]["gaming"]+=gam
         else:
-            compltlb[usr] = {"code": code, "crypt": 0}
+            compltlb[usr] = {"code": code, "crypt": 0, "design": des, "gaming": gam}
     
     obj = json.dumps(compltlb, indent = 4)
     print(obj)
@@ -292,12 +300,14 @@ async def updatelb(ctx):
         wklylb = json.load(f)
     f.close()
     if not wklylb:
-        wklylb = {usr: {"code": code, "crypt": 0}}
+        wklylb = {usr: {"code": code, "crypt": 0, "design": des, "gaming": gam}}
     else:
         if usr in wklylb:
             wklylb[usr]["code"]+=code
+            wklylb[usr]["design"]+=des
+            wklylb[usr]["gaming"]+=gam
         else:
-            wklylb[usr] = {"code": code, "crypt": 0}
+            wklylb[usr] = {"code": code, "crypt": 0, "design": des, "gaming": gam}
     
     obj = json.dumps(wklylb, indent = 4)
     with open("assets/weekly_leaderboard.json", "w") as f:
@@ -313,10 +323,11 @@ async def showlb(ctx):
     f.close()
     if wkly:
         users, crypt, code = [], [], []
+        design, gaming = [], []
         total = []
         finalsc = []
         for usr in wkly:
-            finalsc.append([usr, wkly[usr]["crypt"], wkly[usr]["code"], wkly[usr]["code"]+wkly[usr]["crypt"]])
+            finalsc.append([usr, wkly[usr]["crypt"], wkly[usr]["code"], wkly[usr]["code"]+wkly[usr]["crypt"]+wkly[usr]["design"]+wkly[usr]["gaming"], wkly[usr]["design"], wkly[usr]["gaming"]])
         finalsc = sorted(finalsc, reverse = True, key = lambda x: x[3])
         c = 0
         for each in finalsc:
@@ -331,6 +342,8 @@ async def showlb(ctx):
             crypt.append(each[1])
             code.append(each[2])
             total.append(each[3])
+            design.append(each[4])
+            gaming.append(each[5])
             c+=1
 
         tot = len(wkly)
@@ -350,10 +363,14 @@ async def showlb(ctx):
             e1.add_field(name = "Username", value="\n".join(map(str, users)), inline = True)
             e1.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt)), inline = True)
             e1.add_field(name = "Comdimg Score", value = "\n".join(map(str, code)), inline = True)
+            e1.add_field(name = "Design Score", value = "\n".join(map(str, design)), inline = True)
+            e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming)), inline = True)
         else:
             e1.add_field(name = "Username", value="\n".join(map(str, users[:5])), inline = True)
             e1.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt[:5])), inline = True)
             e1.add_field(name = "Comdimg Score", value = "\n".join(map(str, code[:5])), inline = True)
+            e1.add_field(name = "Design Score", value = "\n".join(map(str, design[:5])), inline = True)
+            e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming[:5])), inline = True)
         e1.set_footer(text = "Page 1", icon_url="https://cdn.discordapp.com/emojis/853313275160035348.gif?v=1")
         embs.append(e1)
         i = 5
@@ -363,10 +380,14 @@ async def showlb(ctx):
                 e.add_field(name = "Username", value="\n".join(map(str, users[i:i+5])), inline = True)
                 e.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt[i:i+5])), inline = True)
                 e.add_field(name = "Comdimg Score", value = "\n".join(map(str, code[i:i+5])), inline = True)
+                e1.add_field(name = "Design Score", value = "\n".join(map(str, design[i:i+5])), inline = True)
+                e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming[i:i+5])), inline = True)
             else:
                 e.add_field(name = "Username", value="\n".join(map(str, users[i:])), inline = True)
                 e.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt[i:])), inline = True)
                 e.add_field(name = "Comdimg Score", value = "\n".join(map(str, code[i:])), inline = True)
+                e1.add_field(name = "Design Score", value = "\n".join(map(str, design[i:])), inline = True)
+                e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming[i:])), inline = True)
             e.set_footer(text = f"Page {pg+1}", icon_url="https://cdn.discordapp.com/emojis/853313275160035348.gif?v=1")
             embs.append(e)
             i+=5
