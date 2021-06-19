@@ -14,6 +14,8 @@ TOKEN = os.environ.get("BOT_TOKEN")
 
 cryptic_id = int(os.environ.get("CRYPTIC"))
 coding_id = int(os.environ.get("CODING"))
+design_id = int(os.environ.get("DESIGN"))
+gaming_id = int(os.environ.get("GAMING"))
 lb_id = int(os.environ.get("LEADERBOARD_CHANNEL"))
 
 act = discord.Game(name = "hmm")
@@ -30,6 +32,8 @@ async def help(ctx):
             e1.add_field(name = "`updatelb`", value = "Format: `.updatelb {username-in-the-server} {coding-score} {design-score} {gaming-score}`.\nIf only one type of score is to be updated please use the others score(s) as 0. For example: If I need to update coding score for stealth.py by 100, type `.updatelb stealth.py 100 0 0`.", inline = False)
             e1.add_field(name = "`cryptic`", value = "Format: `.cryptic {the full challenge message}`.\nFor example: If the challenge message is, let's say, `decode frxf using ROT13`, then you need to type in the command `.cryptic decode frxf using ROT13`.", inline = False)
             e1.add_field(name = "`coding`", value = "Format: `.coding {the full challenge message}`.\nFor example: If the challenge message is, let's say, `make a discord bot which responds whenever a user writes seks in the chat`, then you need to type in the command `.coding make a discord bot which responds whenever a user writes seks in the chat`", inline = False)
+            e1.add_field(name = "`design`", value = "Format: `.design {the full challenge message}`.\nFor example: If the challenge message is, let's say, `{some design related challenge here XD}`, then you need to type in the command `.design {some design related challenge here XD}`", inline = False)
+            e1.add_field(name = "`gaming`", value = "Format: `.design {the full challenge message}`.\nFor example: If the challenge message is, let's say, `{some gaming related challenge here XD}`, then you need to type in the command `.gaming {some gaming related challenge here XD}`", inline = False)
         else:
             e1.add_field(name = "`answer`", value = "Format: `.answer {your-answer-to-the-question}`.\nUse this command to dm the bot with your answer to the current cryptic question. If the answer is correct, the points will be added.\nRemember, 10 points will be deducted as each day passes, till the current level is open. So.. you know what to do don't you :).\nP.S.: PLEASE JUST DM THE BOT WITH THE ANSWER AND NOT USE THIS COMMAND ANYWHERE ELSE!", inline = False)
         e1.add_field(name = "`showlb`", value = "Use this command to print out the current weekly leaderboard.", inline = False)
@@ -52,8 +56,10 @@ async def answer(ctx):
         with open("assets/answer.json", "r") as f:
             to_ans = json.load(f)
         f.close()
-        if to_ans["answer"]==ans:
+        if to_ans["answer"]==ans and usr not in to_ans["users"]:
             crypt = int(to_ans["points"])
+            if to_ans["count"]==0:
+                crypt+=1
             compltlb = {}
             with open("assets/complete_leaderboard.json", "r") as f:
                 compltlb = json.load(f)
@@ -89,6 +95,9 @@ async def answer(ctx):
             with open("assets/weekly_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
+            to_ans["count"]+=1
+            to_ans["users"].append(usr)
+
     elif str(ctx.message.channel.category) == "Admin":
         ans = ctx.message.content.strip(".answer")
         ans = ''.join(ans.split()).lower()
@@ -146,10 +155,11 @@ async def on_time():
         f.close()
         if wkly:
             users, crypt, code = [], [], []
+            design, gaming = [], []
             total = []
             finalsc = []
             for usr in wkly:
-                finalsc.append([usr, wkly[usr]["crypt"], wkly[usr]["code"], wkly[usr]["code"]+wkly[usr]["crypt"]])
+                finalsc.append([usr, wkly[usr]["crypt"], wkly[usr]["code"], wkly[usr]["code"]+wkly[usr]["crypt"]+wkly[usr]["design"]+wkly[usr]["gaming"], wkly[usr]["design"], wkly[usr]["gaming"]])
             finalsc = sorted(finalsc, reverse = True, key = lambda x: x[3])
             c = 0
             for each in finalsc:
@@ -164,6 +174,8 @@ async def on_time():
                 crypt.append(each[1])
                 code.append(each[2])
                 total.append(each[3])
+                design.append(each[4])
+                gaming.append(each[5])
                 c+=1
 
             tot = len(wkly)
@@ -183,10 +195,14 @@ async def on_time():
                 e1.add_field(name = "Username", value="\n".join(map(str, users)), inline = True)
                 e1.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt)), inline = True)
                 e1.add_field(name = "Comdimg Score", value = "\n".join(map(str, code)), inline = True)
+                e1.add_field(name = "Design Score", value = "\n".join(map(str, design)), inline = True)
+                e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming)), inline = True)
             else:
                 e1.add_field(name = "Username", value="\n".join(map(str, users[:5])), inline = True)
                 e1.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt[:5])), inline = True)
                 e1.add_field(name = "Comdimg Score", value = "\n".join(map(str, code[:5])), inline = True)
+                e1.add_field(name = "Design Score", value = "\n".join(map(str, design[:5])), inline = True)
+                e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming[:5])), inline = True)
             e1.set_footer(text = "Page 1", icon_url="https://cdn.discordapp.com/emojis/853313275160035348.gif?v=1")
             embs.append(e1)
             i = 5
@@ -196,10 +212,14 @@ async def on_time():
                     e.add_field(name = "Username", value="\n".join(map(str, users[i:i+5])), inline = True)
                     e.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt[i:i+5])), inline = True)
                     e.add_field(name = "Comdimg Score", value = "\n".join(map(str, code[i:i+5])), inline = True)
+                    e1.add_field(name = "Design Score", value = "\n".join(map(str, design[i:i+5])), inline = True)
+                    e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming[i:i+5])), inline = True)
                 else:
                     e.add_field(name = "Username", value="\n".join(map(str, users[i:])), inline = True)
                     e.add_field(name = "Cryptic Score", value = "\n".join(map(str, crypt[i:])), inline = True)
                     e.add_field(name = "Comdimg Score", value = "\n".join(map(str, code[i:])), inline = True)
+                    e1.add_field(name = "Design Score", value = "\n".join(map(str, design[i:])), inline = True)
+                    e1.add_field(name = "Gaming Score", value = "\n".join(map(str, gaming[i:])), inline = True)
                 e.set_footer(text = f"Page {pg+1}", icon_url="https://cdn.discordapp.com/emojis/853313275160035348.gif?v=1")
                 embs.append(e)
                 i+=5
@@ -259,6 +279,26 @@ async def coding(ctx):
     emb = discord.Embed(title = "Coding Challenges", color = 0x800080)
     ch = bot.get_channel(coding_id)
     msg_content = ctx.message.content.strip(".coding")
+    emb.add_field(name = "Challenge", value = msg_content, inline=False)
+    emb.set_footer(text="Good luck guys! <3")
+    emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
+    await ch.send(embed = emb)
+
+@bot.command()
+async def design(ctx):
+    emb = discord.Embed(title = "Design Challenges", color = 0x800080)
+    ch = bot.get_channel(design_id)
+    msg_content = ctx.message.content.strip(".design")
+    emb.add_field(name = "Challenge", value = msg_content, inline=False)
+    emb.set_footer(text="Good luck guys! <3")
+    emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
+    await ch.send(embed = emb)
+
+@bot.command()
+async def gaming(ctx):
+    emb = discord.Embed(title = "Gaming Challenges", color = 0x800080)
+    ch = bot.get_channel(coding_id)
+    msg_content = ctx.message.content.strip(".gaming")
     emb.add_field(name = "Challenge", value = msg_content, inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
