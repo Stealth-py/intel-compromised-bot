@@ -127,7 +127,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-assets/complete_leaderboard.json
-assets/weekly_leaderboard.json
-test.py
-assets/answer.json
