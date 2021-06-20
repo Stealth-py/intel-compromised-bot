@@ -57,8 +57,8 @@ async def end(ctx, *args):
         f.close()
         print(ob)
         ob["ongoing"] = False
-        ob = json.dumps(ob, indent = 4)
         print(ob)
+        ob = json.dumps(ob, indent = 4)
         with open("assets/answer.json", "w") as f:
             f.write(ob)
         f.close()
@@ -78,7 +78,7 @@ async def answer(ctx, *args):
         ans = ''.join(args)
         ans = ''.join(ans.split()).lower()
         usr = ctx.message.author.name.lower()
-        print(ans, type(usr))
+        print(ans, usr)
         to_ans = {}
         with open("assets/answer.json", "r") as f:
             to_ans = json.load(f)
@@ -101,7 +101,6 @@ async def answer(ctx, *args):
                     compltlb[usr] = {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}
 
             obj = json.dumps(compltlb, indent = 4)
-            print(obj)
             with open("assets/complete_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
@@ -118,6 +117,7 @@ async def answer(ctx, *args):
                 else:
                     wklylb[usr] = {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}
             obj = json.dumps(wklylb, indent = 4)
+            print(wklylb)
             with open("assets/weekly_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
@@ -183,7 +183,7 @@ async def on_time():
     day = calendar.day_name[my_date.weekday()]
     my_date = str(my_date)
     day = str(day)
-    # print(my_date, day)
+    print(my_date, day)
     if "00:00:00" in my_date and day=="Monday":
         ch = bot.get_channel(lb_id)
         await ch.send("Weekly leaderboard has reset.")
@@ -361,9 +361,8 @@ async def updatelb(ctx, *args):
             compltlb[usr]["gaming"]+=gam
         else:
             compltlb[usr] = {"code": code, "crypt": 0, "design": des, "gaming": gam}
-    
+    print(compltlb)
     obj = json.dumps(compltlb, indent = 4)
-    print(obj)
     with open("assets/complete_leaderboard.json", "w") as f:
         f.write(obj)
     f.close()
@@ -470,7 +469,7 @@ async def showlb(ctx):
         await msg.add_reaction('◀')
         await msg.add_reaction('▶')
         await msg.add_reaction('⏭')
-        print(embs, type(msg), pages, users)
+        print(users)
         emoji = ''
         while 1:
             if emoji=="\u23ee":
