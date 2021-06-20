@@ -39,7 +39,7 @@ async def help(ctx):
             e1.add_field(name = "`answer`", value = "Format: `.answer {your-answer-to-the-question}`.\nUse this command to dm the bot with your answer to the current cryptic question. If the answer is correct, the points will be added.\nRemember, 10 points will be deducted as each day passes, till the current level is open. So.. you know what to do don't you :).\nP.S.: PLEASE JUST DM THE BOT WITH THE ANSWER AND NOT USE THIS COMMAND ANYWHERE ELSE!", inline = False)
         e1.add_field(name = "`showlb`", value = "Use this command to print out the current weekly leaderboard.", inline = False)
         e1.set_thumbnail(url="https://cdn.discordapp.com/emojis/853313275160035348.gif?v=1")
-        e1.set_footer(text = "hmmmk.", icon_url="https://cdn.discordapp.com/emojis/815651236162306078.png?v=1")
+        e1.set_footer(text = "Made with <3 by stelth(best mod? ;))", icon_url="https://cdn.discordapp.com/emojis/853470948555882526.png?v=1")
     except:
         e1.add_field(name = "hmm", value = "ok just use this command in the server you dumbass ._. bruh.. meh.")
         e1.set_thumbnail(url="https://media1.tenor.com/images/dd0935f96369c070cfba271ef0fce74a/tenor.gif?itemid=12516944")
