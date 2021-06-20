@@ -101,6 +101,7 @@ async def answer(ctx, *args):
                     compltlb[usr] = {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}
 
             obj = json.dumps(compltlb, indent = 4)
+            print(obj)
             with open("assets/complete_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
@@ -117,7 +118,6 @@ async def answer(ctx, *args):
                 else:
                     wklylb[usr] = {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}
             obj = json.dumps(wklylb, indent = 4)
-            print(obj)
             with open("assets/weekly_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
@@ -186,6 +186,7 @@ async def on_time():
     # print(my_date, day)
     if "00:00:00" in my_date and day=="Monday":
         ch = bot.get_channel(lb_id)
+        await ch.send("Weekly leaderboard has reset.")
         wkly = {}
         with open("assets/weekly_leaderboard.json", "r") as f:
             wkly = json.load(f)
@@ -312,7 +313,6 @@ async def cryptic(ctx, *, args):
 
 @bot.command()
 async def coding(ctx, *, args):
-    print(type(args))
     emb = discord.Embed(title = "Coding Challenges", color = 0x800080)
     ch = bot.get_channel(coding_id)
     emb.add_field(name = "Challenge", value = f"""{args}""", inline=False)
