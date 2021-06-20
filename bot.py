@@ -18,7 +18,7 @@ design_id = int(os.environ.get("DESIGN"))
 gaming_id = int(os.environ.get("GAMING"))
 lb_id = int(os.environ.get("LEADERBOARD_CHANNEL"))
 
-act = discord.Game(name = "hmm")
+act = discord.Game(name = ".help | hmm.")
 
 bot = commands.Bot(command_prefix=".", case_insensitive = True, activity = act)
 bot.remove_command('help')
@@ -28,27 +28,54 @@ async def help(ctx):
     e1 = discord.Embed(title = "Help", color = 0xFFFFFF)
     try:
         if str(ctx.message.channel.category) == "Admin":
+            e1.add_field(name = "`end`", value = "Use this command to mark an official end to the current week's challenges. This command will also stop accepting dm submissions for the cryptic challenge.", inline = False)
             e1.add_field(name = "`answer`", value = "Use this format to store the answer to the current cryptic hunt question.\nFormat: `.answer {put-your-answer-here}`\nFor example: `.answer seks` will put in the answer to the current question as `seks`.", inline = False)
             e1.add_field(name = "`updatelb`", value = "Format: `.updatelb {username-in-the-server} {coding-score} {design-score} {gaming-score}`.\nIf only one type of score is to be updated please use the others score(s) as 0. For example: If I need to update coding score for stealth.py by 100, type `.updatelb stealth.py 100 0 0`.", inline = False)
             e1.add_field(name = "`cryptic`", value = "Format: `.cryptic {the full challenge message}`.\nFor example: If the challenge message is, let's say, `decode frxf using ROT13`, then you need to type in the command `.cryptic decode frxf using ROT13`.", inline = False)
             e1.add_field(name = "`coding`", value = "Format: `.coding {the full challenge message}`.\nFor example: If the challenge message is, let's say, `make a discord bot which responds whenever a user writes seks in the chat`, then you need to type in the command `.coding make a discord bot which responds whenever a user writes seks in the chat`", inline = False)
             e1.add_field(name = "`design`", value = "Format: `.design {the full challenge message}`.\nFor example: If the challenge message is, let's say, `{some design related challenge here XD}`, then you need to type in the command `.design {some design related challenge here XD}`", inline = False)
-            e1.add_field(name = "`gaming`", value = "Format: `.design {the full challenge message}`.\nFor example: If the challenge message is, let's say, `{some gaming related challenge here XD}`, then you need to type in the command `.gaming {some gaming related challenge here XD}`", inline = False)
+            e1.add_field(name = "`gaming`", value = "Format: `.gaming {the full challenge message}`.\nFor example: If the challenge message is, let's say, `{some gaming related challenge here XD}`, then you need to type in the command `.gaming {some gaming related challenge here XD}`", inline = False)
         else:
             e1.add_field(name = "`answer`", value = "Format: `.answer {your-answer-to-the-question}`.\nUse this command to dm the bot with your answer to the current cryptic question. If the answer is correct, the points will be added.\nRemember, 10 points will be deducted as each day passes, till the current level is open. So.. you know what to do don't you :).\nP.S.: PLEASE JUST DM THE BOT WITH THE ANSWER AND NOT USE THIS COMMAND ANYWHERE ELSE!", inline = False)
         e1.add_field(name = "`showlb`", value = "Use this command to print out the current weekly leaderboard.", inline = False)
-        e1.set_footer(text = "hmmm.", icon_url="https://cdn.discordapp.com/emojis/815651236162306078.png?v=1")
+        e1.set_thumbnail(url="https://cdn.discordapp.com/emojis/853313275160035348.gif?v=1")
+        e1.set_footer(text = "hmmmk.", icon_url="https://cdn.discordapp.com/emojis/815651236162306078.png?v=1")
     except:
-        e1.add_field(name = "hmm", value = "ok just use this command in the server you dumbo ._. fkn dumbass.. meh.")
+        e1.add_field(name = "hmm", value = "ok just use this command in the server you dumbass ._. bruh.. meh.")
         e1.set_thumbnail(url="https://media1.tenor.com/images/dd0935f96369c070cfba271ef0fce74a/tenor.gif?itemid=12516944")
         e1.set_footer(text = "ok well im a bit moody and not in a good mood rn. bring me a IMMIMMHNMHMMHMMHNNIMMINMINMHNM and bacon. i like that but with some vinegar on top, don't forget that.", icon_url="https://cdn.discordapp.com/emojis/845241476895866890.gif?v=1")
     await ctx.send(embed = e1)
 
+@bot.command()
+async def end(ctx, *args):
+    e = discord.Embed(title = "Challenges have ended...", color = 0x4e5d94)
+    ch = bot.get_channel(855843542428287006)
+    if str(ctx.message.channel.category)=="Admin":
+        ob = {}
+        with open("assets/answer.json", "r") as f:
+            ob = json.load(f)
+        f.close()
+        print(ob)
+        ob["ongoing"] = False
+        ob = json.dumps(ob, indent = 4)
+        print(ob)
+        with open("assets/answer.json", "w") as f:
+            f.write(ob)
+        f.close()
+        e.add_field(name = "Good work guys :)", value = "@here This week's challenges have finally come to an end. Take some rest and wait for the judgement and new challenges, which would be starting off from Monday, next week. Obviously. ;)", inline = False)
+        e.set_footer(text = "hmmk", icon_url="https://cdn.discordapp.com/emojis/815651236162306078.png?v=1")
+        e.set_thumbnail(url = "https://i.giphy.com/media/SeysxkSfenHY4/giphy.gif")
+        await ch.send(embed = e)
+    else:
+        e.add_field(name = "smarty", value = "how about a NO")
+        e.set_thumbnail(url="https://i.gifer.com/Mw74.gif")
+        await ctx.channel.send(embed = e)
+
 
 @bot.command()
-async def answer(ctx):
+async def answer(ctx, *args):
     if isinstance(ctx.channel, discord.channel.DMChannel):
-        ans = ctx.message.content.strip(".answer")
+        ans = ''.join(args)
         ans = ''.join(ans.split()).lower()
         usr = ctx.message.author.name.lower()
         print(ans, type(usr))
@@ -56,7 +83,7 @@ async def answer(ctx):
         with open("assets/answer.json", "r") as f:
             to_ans = json.load(f)
         f.close()
-        if to_ans["answer"]==ans and usr not in to_ans["users"]:
+        if to_ans["ongoing"] and to_ans["answer"]==ans and usr not in to_ans["completed"]:
             crypt = int(to_ans["points"])
             if to_ans["count"]==0:
                 crypt+=1
@@ -66,15 +93,14 @@ async def answer(ctx):
             f.close()
 
             if not compltlb:
-                compltlb = {usr: {"code": 0, "crypt": crypt}}
+                compltlb = {usr: {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}}
             else:
                 if usr in compltlb:
                     compltlb[usr]["crypt"]+=crypt
                 else:
-                    compltlb[usr] = {"code": 0, "crypt": crypt}
+                    compltlb[usr] = {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}
 
             obj = json.dumps(compltlb, indent = 4)
-            print(obj)
             with open("assets/complete_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
@@ -84,24 +110,33 @@ async def answer(ctx):
                 wklylb = json.load(f)
             f.close()
             if not wklylb:
-                wklylb = {usr: {"code": 0, "crypt": crypt}}
+                wklylb = {usr: {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}}
             else:
                 if usr in wklylb:
                     wklylb[usr]["crypt"]+=crypt
                 else:
-                    wklylb[usr] = {"code": 0, "crypt": crypt}
+                    wklylb[usr] = {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}
             obj = json.dumps(wklylb, indent = 4)
             print(obj)
             with open("assets/weekly_leaderboard.json", "w") as f:
                 f.write(obj)
             f.close()
+            
             to_ans["count"]+=1
-            to_ans["users"].append(usr)
+            to_ans["completed"].append(usr)
+            obj = json.dumps(to_ans, indent= 4)
+            with open("assets/answer.json", "w") as f:
+                f.write(obj)
+            f.close()
+            
+            emb = discord.Embed(title = "Correct Answer :)", color=0xFFC0CB)
+            emb.add_field(name = "Well done", value = "That answer is correct! Well done! Now, relax. Your points will be added to the points table.", inline = False)
+            emb.set_thumbnail(url="https://media1.tenor.com/images/2386d12e54aa11ce0298d100954d982a/tenor.gif?itemid=4115606")
+            await ctx.send(embed = emb)
 
     elif str(ctx.message.channel.category) == "Admin":
-        ans = ctx.message.content.strip(".answer")
-        ans = ''.join(ans.split()).lower()
-        to_ans = {"answer": ans, "points": 100}
+        ans = ''.join(args).lower()
+        to_ans = {"answer": ans, "points": 100, "count": 0, "completed": [], "ongoing": True}
         obj = json.dumps(to_ans, indent=4)
         with open("assets/answer.json", "w") as f:
             f.write(obj)
@@ -121,16 +156,18 @@ async def decrement_score():
     my_date = datetime.now()
     day = my_date.weekday()
     if "00:00:00" in str(my_date):
+        ch = bot.get_channel(782719007664242741)
         ans = {}
         with open("assets/answer.json", "r") as f:
             ans = json.load(f)
         f.close()
-        if ans["complete"] == "false":
+        if ans["ongoing"] == True:
             ans["points"] -= 10*day
         obj = json.dumps(ans, indent=4)
         with open("assets/answer.json", "w") as f:
             f.write(obj)
         f.close()
+        await ch.send("Score has decreased by 10 points.")
 
 
 decrement_score.start()
@@ -147,7 +184,7 @@ async def on_time():
     my_date = str(my_date)
     day = str(day)
     # print(my_date, day)
-    if "20:56:00" in my_date and day=="Wednesday":
+    if "00:00:00" in my_date and day=="Monday":
         ch = bot.get_channel(lb_id)
         wkly = {}
         with open("assets/weekly_leaderboard.json", "r") as f:
@@ -265,49 +302,48 @@ on_time.start()
 ###
 
 @bot.command()
-async def cryptic(ctx):
+async def cryptic(ctx, *args):
     emb = discord.Embed(title = "Cryptic Challenge", color = 0x800080)
     ch = bot.get_channel(cryptic_id)
-    msg_content = ctx.message.content.strip(".cryptic")
+    msg_content = ' '.join(args)
     emb.add_field(name = "Challenge", value = msg_content, inline = False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
 
 @bot.command()
-async def coding(ctx):
+async def coding(ctx, *args):
     emb = discord.Embed(title = "Coding Challenges", color = 0x800080)
     ch = bot.get_channel(coding_id)
-    msg_content = ctx.message.content.strip(".coding")
+    msg_content = ' '.join(args)
     emb.add_field(name = "Challenge", value = msg_content, inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
 
 @bot.command()
-async def design(ctx):
+async def design(ctx, *args):
     emb = discord.Embed(title = "Design Challenges", color = 0x800080)
     ch = bot.get_channel(design_id)
-    msg_content = ctx.message.content.strip(".design")
+    msg_content = ' '.join(args)
     emb.add_field(name = "Challenge", value = msg_content, inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
 
 @bot.command()
-async def gaming(ctx):
+async def gaming(ctx, *args):
     emb = discord.Embed(title = "Gaming Challenges", color = 0x800080)
     ch = bot.get_channel(coding_id)
-    msg_content = ctx.message.content.strip(".gaming")
+    msg_content = ' '.join(args)
     emb.add_field(name = "Challenge", value = msg_content, inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
 
 @bot.command()
-async def updatelb(ctx):
-    msg = ctx.message.content.strip(".updatelb")
-    usr, code, des, gam = msg.split()
+async def updatelb(ctx, *args):
+    usr, code, des, gam = args[0], args[1], args[2], args[3]
     code = int(code)
     des = int(des)
     gam = int(gam)
