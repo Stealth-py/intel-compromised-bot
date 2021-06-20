@@ -85,13 +85,16 @@ async def answer(ctx, *args):
         f.close()
         if to_ans["ongoing"] and to_ans["answer"]==ans and usr not in to_ans["completed"]:
             crypt = int(to_ans["points"])
-            if to_ans["count"]==0:
-                crypt+=1
             compltlb = {}
             with open("assets/complete_leaderboard.json", "r") as f:
                 compltlb = json.load(f)
             f.close()
-
+            if to_ans["count"]==0:
+                crypt+=3
+            elif to_ans["count"]==1:
+                crypt+=2
+            elif to_ans["count"]==2:
+                crypt+=1
             if not compltlb:
                 compltlb = {usr: {"code": 0, "crypt": crypt, "design": 0, "gaming": 0}}
             else:
@@ -124,6 +127,7 @@ async def answer(ctx, *args):
             
             to_ans["count"]+=1
             to_ans["completed"].append(usr)
+            print(to_ans)
             obj = json.dumps(to_ans, indent= 4)
             with open("assets/answer.json", "w") as f:
                 f.write(obj)
