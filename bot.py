@@ -302,41 +302,38 @@ on_time.start()
 ###
 
 @bot.command()
-async def cryptic(ctx, *args):
+async def cryptic(ctx, *, args):
     emb = discord.Embed(title = "Cryptic Challenge", color = 0x800080)
     ch = bot.get_channel(cryptic_id)
-    msg_content = ' '.join(args)
-    emb.add_field(name = "Challenge", value = msg_content, inline = False)
+    emb.add_field(name = "Challenge", value = f"""{args}""", inline = False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
 
 @bot.command()
-async def coding(ctx, *args):
+async def coding(ctx, *, args):
+    print(type(args))
     emb = discord.Embed(title = "Coding Challenges", color = 0x800080)
     ch = bot.get_channel(coding_id)
-    msg_content = ' '.join(args)
-    emb.add_field(name = "Challenge", value = msg_content, inline=False)
+    emb.add_field(name = "Challenge", value = f"""{args}""", inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
 
 @bot.command()
-async def design(ctx, *args):
+async def design(ctx, *, args):
     emb = discord.Embed(title = "Design Challenges", color = 0x800080)
     ch = bot.get_channel(design_id)
-    msg_content = ' '.join(args)
-    emb.add_field(name = "Challenge", value = msg_content, inline=False)
+    emb.add_field(name = "Challenge", value = f"""{args}""", inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
 
 @bot.command()
-async def gaming(ctx, *args):
+async def gaming(ctx, *, args):
     emb = discord.Embed(title = "Gaming Challenges", color = 0x800080)
     ch = bot.get_channel(coding_id)
-    msg_content = ' '.join(args)
-    emb.add_field(name = "Challenge", value = msg_content, inline=False)
+    emb.add_field(name = "Challenge", value = f"""{args}""", inline=False)
     emb.set_footer(text="Good luck guys! <3")
     emb.set_thumbnail(url = "https://media1.tenor.com/images/d3f7680f8c32557237d41a1ea43854e5/tenor.gif?itemid=21381920")
     await ch.send(embed = emb)
