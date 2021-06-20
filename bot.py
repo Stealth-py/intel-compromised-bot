@@ -183,7 +183,6 @@ async def on_time():
     day = calendar.day_name[my_date.weekday()]
     my_date = str(my_date)
     day = str(day)
-    print(my_date, day)
     if "00:00:00" in my_date and day=="Monday":
         ch = bot.get_channel(lb_id)
         await ch.send("Weekly leaderboard has reset.")
