@@ -4,6 +4,7 @@ from discord import activity
 from discord.channel import DMChannel
 from discord.ext import commands, tasks
 from discord.ext.commands import context
+from discord.ext.commands.flags import F
 from dotenv import load_dotenv
 import json
 from datetime import date, datetime
@@ -17,6 +18,7 @@ coding_id = int(os.environ.get("CODING"))
 design_id = int(os.environ.get("DESIGN"))
 gaming_id = int(os.environ.get("GAMING"))
 lb_id = int(os.environ.get("LEADERBOARD_CHANNEL"))
+logs = int(os.environ["LOGS"])
 
 act = discord.Game(name = ".help | hmm.")
 
@@ -73,11 +75,13 @@ async def end(ctx, *args):
 
 
 @bot.command()
-async def answer(ctx, *args):
+async def answer(ctx, *, args):
     if isinstance(ctx.channel, discord.channel.DMChannel):
-        ans = ''.join(args)
-        ans = ''.join(ans.split()).lower()
+        e = discord.Embed(title = "Answer logs")
+        ch = bot.get_channel(logs)
+        ans = ''.join(args).lower()
         usr = ctx.message.author.name.lower()
+        e.add_field(name = f"{usr}", value = f"Answer: {ans}", inline = False)
         print(ans, usr)
         to_ans = {}
         with open("assets/answer.json", "r") as f:
@@ -129,6 +133,7 @@ async def answer(ctx, *args):
             to_ans["completed"].append(usr)
             print(to_ans)
             obj = json.dumps(to_ans, indent= 4)
+            e.add_field(name = "current overall logs", value = f"{obj}", inline = False)
             with open("assets/answer.json", "w") as f:
                 f.write(obj)
             f.close()
@@ -137,6 +142,7 @@ async def answer(ctx, *args):
             emb.add_field(name = "Well done", value = "That answer is correct! Well done! Now, relax. Your points will be added to the points table.", inline = False)
             emb.set_thumbnail(url="https://media1.tenor.com/images/2386d12e54aa11ce0298d100954d982a/tenor.gif?itemid=4115606")
             await ctx.send(embed = emb)
+        await ch.send(embed = e)
 
     elif str(ctx.message.channel.category) == "Admin":
         ans = ''.join(args).lower()
@@ -305,6 +311,48 @@ async def on_time():
 on_time.start()
 ###
 
+###
+
+@bot.command()
+async def remove(ctx, *, args):
+    ch = bot.get_channel(856427385758023701)
+    e = discord.Embed(title= "User removed")
+    lb = {}
+    with open("assets/complete_leaderboard.json", "r") as f:
+        lb = json.load(f)
+    f.close()
+    args = ''.join(args).lower()
+    if args in lb:
+        lb.pop(args)
+    lb = json.dumps(indent = 4)
+    e.add_field(name = "Complete leaderboard rn", value = f"{lb}", inline = False)
+    with open("assets/complete_leaderboard.json", "w") as f:
+        f.write(lb)
+    f.close()
+    with open("assets/weekly_leaderboard.json", "r") as f:
+        lb = json.load(f)
+    f.close()
+    if args in lb:
+        lb.pop(args)
+    lb = json.dumps(indent = 4)
+    with open("assets/weekly_leaderboard.json", "w") as f:
+        f.write(lb)
+    f.close()
+    with open("assets/answer.json", "r") as f:
+        lb = json.load(f)
+    f.close()
+    if args in lb:
+        lb["completed"].remove(args)
+        lb["count"]-=1
+    lb = json.dumps(indent = 4)
+    e.add_field(name = "Answer logs after removing", value = f"{lb}", inline = False)
+    with open("assets/answer.json", "w") as f:
+        f.write(lb)
+    f.close()
+    await ch.send(embed = e)
+
+
+###
 @bot.command()
 async def cryptic(ctx, *, args):
     emb = discord.Embed(title = "Cryptic Challenge", color = 0x800080)
