@@ -79,7 +79,7 @@ async def answer(ctx, *, args):
     if isinstance(ctx.channel, discord.channel.DMChannel):
         e = discord.Embed(title = "Answer logs")
         ch = bot.get_channel(logs)
-        ans = ''.join(args).lower()
+        ans = ''.join(list(args)).lower()
         usr = ctx.message.author.name.lower()
         e.add_field(name = f"{usr}", value = f"Answer: {ans}", inline = False)
         print(ans, usr)
