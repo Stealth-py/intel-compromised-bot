@@ -324,7 +324,7 @@ async def remove(ctx, *, args):
     args = ''.join(args).lower()
     if args in lb:
         lb.pop(args)
-    lb = json.dumps(indent = 4)
+    lb = json.dumps(lb, indent = 4)
     e.add_field(name = "Complete leaderboard rn", value = f"{lb}", inline = False)
     with open("assets/complete_leaderboard.json", "w") as f:
         f.write(lb)
@@ -334,7 +334,7 @@ async def remove(ctx, *, args):
     f.close()
     if args in lb:
         lb.pop(args)
-    lb = json.dumps(indent = 4)
+    lb = json.dumps(lb, indent = 4)
     with open("assets/weekly_leaderboard.json", "w") as f:
         f.write(lb)
     f.close()
@@ -344,7 +344,7 @@ async def remove(ctx, *, args):
     if args in lb:
         lb["completed"].remove(args)
         lb["count"]-=1
-    lb = json.dumps(indent = 4)
+    lb = json.dumps(lb, indent = 4)
     e.add_field(name = "Answer logs after removing", value = f"{lb}", inline = False)
     with open("assets/answer.json", "w") as f:
         f.write(lb)
