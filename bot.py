@@ -473,12 +473,6 @@ async def showlb(ctx):
         pages = tot//5 + 1
         if tot%5==0:
             pages-=1
-        
-        wklylb = {}
-        obj = json.dumps(wklylb, indent = 4)
-        with open("assets/weekly_leaderboard.json", "w") as f:
-            f.write(obj)
-        f.close()
 
         embs = []
         e1 = discord.Embed(title="Weekly Leaderboard", color = 0xFFD700)
