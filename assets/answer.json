@@ -1,1 +1,10 @@
-{"answer": "ᛁᛏ ᛁᛋ ᚹᚺᚨᛏ ᛁᛏ ᛁᛋ", "points": 100, "count": 1, "completed": ["kxee"], "ongoing": true}
+{"answer": "ᛁᛏ ᛁᛋ ᚹᚺᚨᛏ ᛁᛏ ᛁᛋ",
+    "points": 70,
+    "count": 3,
+    "completed": [
+    "kxee",
+    "scorpion.py",
+    "farthestmage"
+    ],
+    "ongoing": true
+    }

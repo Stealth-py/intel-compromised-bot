@@ -1,7 +1,25 @@
-{"kxee":
-    {
+{
+    "kxee":{
         "code": 0,
         "crypt": 103,
+        "design": 0,
+        "gaming": 0
+    },
+    "scorpion.py":{
+        "code": 0,
+        "crypt": 102,
+        "design": 0,
+        "gaming": 100
+    },
+    "unstoppable":{
+        "code": 0,
+        "crypt": 0,
+        "design": 0,
+        "gaming": 100
+    },
+    "farthestmage":{
+        "code": 0,
+        "crypt": 71,
         "design": 0,
         "gaming": 0
     }
