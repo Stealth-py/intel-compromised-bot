@@ -5,7 +5,7 @@ attrs==21.2.0
 chardet==4.0.0
 idna==3.2
 multidict==5.1.0
-Pillow==8.2.0
+pillow==9.2.0
 python-dotenv==0.17.1
 typing-extensions==3.10.0.0
 yarl==1.6.3
